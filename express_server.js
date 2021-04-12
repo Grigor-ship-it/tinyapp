@@ -11,7 +11,7 @@ function generateRandomString() {
  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
  for (let x = 0; x <= 6; x++) {
    id.push(characters.charAt(Math.floor(Math.random()*characters.length)))
- } return console.log(id)
+ } return id.join("")
 } 
 
 
@@ -52,7 +52,11 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  
+  urlDatabase[shortURL] = longURL;
+  console.log(urlDatabase);
   res.send("Ok");         
 });
 
