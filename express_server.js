@@ -2,18 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const generateRandomString = require('./index')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-function generateRandomString() {
- let id = [];
- const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
- for (let x = 0; x <= 6; x++) {
-   id.push(characters.charAt(Math.floor(Math.random()*characters.length)))
- } return id.join("")
-} 
-
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
