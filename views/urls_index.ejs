@@ -12,11 +12,14 @@
 <body>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+    <form method="POST" action="/urls/9sm5xK/delete">...</form>
+    
     <table class="table">
       <thead>
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -24,6 +27,7 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <td><input type="submit" button type="button" class="btn btn-danger" value="Delete"></td>
           </tr>
         <% } %>
       </tbody>
