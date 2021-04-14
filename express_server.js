@@ -9,9 +9,10 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+
 const emailChecker = function(usersObj, userEmail) {
   for (let user in usersObj) {
-    console.log(Object.keys(usersObj), "logging users")
+    //console.log(Object.keys(usersObj), "logging users")
      if (usersObj[user].email === userEmail) {
       return true
       } 
@@ -24,6 +25,18 @@ const emailChecker = function(usersObj, userEmail) {
     } 
   } return false*/
 }
+
+const authenticator = function(usersObj, userEmail, userPass) {
+  for (let user in usersObj) {
+   if (usersObj[user].email === userEmail) {
+    if (usersObj[user].password === userPass) {
+      return usersObj[user].id
+    }  return "Password Error"
+   }
+} return "Email Error"
+}    
+     
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -130,7 +143,15 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 app.post("/login", (req, res) => {
   
-  res.cookie('name', req.body.username)
+  if(authenticator(users, req.body.email, req.body.password) === "Email Error") {
+    res.send("Error 403: Email not found")
+  };
+  if(authenticator(users, req.body.email, req.body.password) === "Password Error") {
+    res.send("Error 403: Password does not match")
+  };
+  
+    res.cookie('user_id', (authenticator(users, req.body.email, req.body.password)))
+  
   res.redirect("/urls/")
 })
 
@@ -140,10 +161,10 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/register", (req, res) => {
-  console.log(req.body.email, "Emails")
+  //console.log(req.body.email, "Emails")
   if (!req.body.email || !req.body.password){
     return res.send("Error 400 Bad Request")
-  } console.log(emailChecker(users, req.body.email), "Register Test")
+  } //console.log(emailChecker(users, req.body.email), "Register Test")
   if (emailChecker(users, req.body.email)=== true) {
     return res.send("Error 400, Email is already in use")
   }
