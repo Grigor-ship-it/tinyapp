@@ -4,11 +4,26 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const generateRandomString = require('./index')
 const cookieParser = require("cookie-parser");
+//const emailChecker = require('./index')
 
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
+const emailChecker = function(usersObj, userEmail) {
+  for (let user in usersObj) {
+    console.log(Object.keys(usersObj), "logging users")
+     if (usersObj[user].email === userEmail) {
+      return true
+      } 
+    
+  } return false
+ /* let keys = Object.keys(usersObj)
+  for (let key of keys) {
+    if (usersObj[key].email === userEmail) {
+      return true
+    } 
+  } return false*/
+}
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -26,7 +41,7 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-
+//console.log(emailChecker(users, "gb795@hotmail.com"), "TEST")
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -42,7 +57,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies.user_id
-  console.log(req.cookies)
+ // console.log(req.cookies)
 const templateVars = { urls: urlDatabase, user: users[userID] };
   res.render("urls_index", templateVars);
 });
@@ -114,14 +129,22 @@ app.post("/login", (req, res) => {
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('name')
+  res.clearCookie('user_id')
   res.redirect("urls")
 })
 
 app.post("/register", (req, res) => {
+  console.log(req.body.email, "Emails")
+  if (!req.body.email || !req.body.password){
+    return res.send("Error 400 Bad Request")
+  } console.log(emailChecker(users, req.body.email), "Register Test")
+  if (emailChecker(users, req.body.email)=== true) {
+    return res.send("Error 400, Email is already in use")
+  }
   const userID = generateRandomString();
   users[userID] = {id: userID, email: req.body.email, password: req.body.password}
   res.cookie('user_id', userID)
-  console.log(users)
+  console.log(users, "Users")
   res.redirect("urls")
+  
 })
