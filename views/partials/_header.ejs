@@ -11,21 +11,24 @@
       </div>
     </div>
     <% if (user) { %>
-      <h5>Logged In As:   </h5>
-      <b><%= user.email %></b>
+      <h5 style="margin-right: 15px">Logged In As:   </h5>
+
+      <h5 style="margin-right: 15px"><%= user.email %></h5>
+
       <form method="POST" action=<%=`/logout`%>>
-        <input type="submit" button type="button" class="btn btn-danger" value="Logout"></form>
+        <input type="submit" button type="button" class="btn btn-danger" value="Logout">
+      </form>
    <% } else { %>
     <form class="form-inline" action="/login" method="POST">
       
 
-      <a class="nav-item nav-link" href="/register">Register</a>
+      <a class="nav-item nav-link btn btn-dark" style= "margin-right: 15px;"href="/register">Register</a>
 
     
     <form class="form-inline" action="/login" method="POST">
       
 
-      <a class="nav-item nav-link" href="/login">Login</a>
+      <a class="nav-item nav-link btn btn-primary" href="/login">Login</a>
       </div>
     </form>
  <% } %>
