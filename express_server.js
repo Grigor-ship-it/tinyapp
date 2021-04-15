@@ -2,29 +2,13 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-const generateRandomString = require('./index')
+const {generateRandomString} = require('./index')
 const cookieParser = require("cookie-parser");
-//const emailChecker = require('./index')
+const {emailChecker} = require('./index')
 
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-const emailChecker = function(usersObj, userEmail) {
-  for (let user in usersObj) {
-    //console.log(Object.keys(usersObj), "logging users")
-     if (usersObj[user].email === userEmail) {
-      return true
-      } 
-    
-  } return false
- /* let keys = Object.keys(usersObj)
-  for (let key of keys) {
-    if (usersObj[key].email === userEmail) {
-      return true
-    } 
-  } return false*/
-}
 
 const authenticator = function(usersObj, userEmail, userPass) {
   for (let user in usersObj) {
