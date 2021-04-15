@@ -19,7 +19,23 @@ const authenticator = function(usersObj, userEmail, userPass) {
    }
 } return "Email Error"
 }    
-     
+
+const urlsUser = function(id) {
+  let newVars = {}
+ 
+    for (let url in urlDatabase) {
+      //console.log(urlDatabase[url]['userID'], "test")
+        if (urlDatabase[url]['userID'] === id) {
+          newVars[url] = urlDatabase[url] 
+         // newVars[user].longURL = database[user].Longurl
+        }
+      
+    } 
+    console.log(newVars)
+    return newVars
+    
+  
+}    
 
 const urlDatabase = {
   //"b2xVn2": "http://www.lighthouselabs.ca",
@@ -53,10 +69,16 @@ app.get("/urls.json", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
+  
   const userID = req.cookies.user_id
- // console.log(req.cookies)
-const templateVars = { urls: urlDatabase, user: users[userID] };
-  res.render("urls_index", templateVars);
+  if (!userID) {
+    res.redirect("/login")
+  } else { 
+    const urlsOfUser = urlsUser(userID)
+ 
+const templateVars = { urls: urlsOfUser, user: users[userID] }; 
+  res.render("urls_index", templateVars); 
+  }
 });
 
 app.get("/urls/new", (req, res) => {
@@ -83,9 +105,12 @@ app.get("/login", (req, res) => {
 })
 
 app.get("/urls/:shortURL", (req, res) => {
-  
+  if (!req.cookies.user_id) {
+    res.redirect("/urls/")
+  }
+ 
   let longurl = urlDatabase[req.params.shortURL].longURL
-  console.log("shortURL")
+  //console.log("shortURL")
   const userID = req.cookies.user_id
   const templateVars = { shortURL: req.params.shortURL , longURL: longurl, user: users[userID] };
   //console.log(longurl.longURL)
@@ -94,12 +119,14 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL", (req ,res) => {
-  
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL].id) {
   const shortURL = req.params.shortURL 
  
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies.user_id};
   res.redirect(`/urls/${shortURL}/`)
-  
+  } else {
+    res.redirect("/urls/")
+  }
 })
 
 
@@ -107,7 +134,7 @@ app.post("/urls/:shortURL", (req ,res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  console.log(longURL)
+  //console.log(longURL)
   urlDatabase[shortURL]= { longURL: longURL, userID: req.cookies.user_id};
   
   res.redirect(`/urls/${shortURL}`);         
@@ -116,19 +143,21 @@ app.post("/urls", (req, res) => {
 
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  
+  console.log(req.cookies.user_id)
+  console.log(urlDatabase[req.params.shortURL]['userID'])
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL]['userID']) {
   delete urlDatabase[req.params.shortURL]
-   
+  }
    res.redirect("/urls/")
 });
 
 app.post("/login", (req, res) => {
   
   if(authenticator(users, req.body.email, req.body.password) === "Email Error") {
-    res.send("Error 403: Email not found")
+    res.status(403).send("Error 403: Email not found")
   };
   if(authenticator(users, req.body.email, req.body.password) === "Password Error") {
-    res.send("Error 403: Password does not match")
+    res.status(403).send("Error 403: Password does not match")
   };
   
     res.cookie('user_id', (authenticator(users, req.body.email, req.body.password)))
@@ -158,7 +187,7 @@ app.post("/register", (req, res) => {
 })
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL
-  console.log(longURL)
-  console.log(req.params.shortURL)
+  //console.log(longURL)
+  //console.log(req.params.shortURL)
   res.redirect(longURL);
 });
