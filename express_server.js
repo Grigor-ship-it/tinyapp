@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const {generateRandomString} = require('./index')
 const cookieParser = require("cookie-parser");
 const {emailChecker} = require('./index')
+const bcrypt = require('bcrypt');
 
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -13,7 +14,7 @@ app.set("view engine", "ejs");
 const authenticator = function(usersObj, userEmail, userPass) {
   for (let user in usersObj) {
    if (usersObj[user].email === userEmail) {
-    if (usersObj[user].password === userPass) {
+    if (bcrypt.compareSync(userPass, usersObj[user].password)) {
       return usersObj[user].id
     }  return "Password Error"
    }
@@ -179,7 +180,7 @@ app.post("/register", (req, res) => {
     return res.send("Error 400, Email is already in use")
   }
   const userID = generateRandomString();
-  users[userID] = {id: userID, email: req.body.email, password: req.body.password}
+  users[userID] = {id: userID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)}
   res.cookie('user_id', userID)
   console.log(users, "Users")
   res.redirect("urls")
