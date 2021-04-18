@@ -87,7 +87,7 @@ app.get("/register", (req, res) => {
 
 //Our login page which again sets user to null for login purposes.
 app.get("/login", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: null};
+  const templateVars = { urls: urlDatabase, user: null, error: null};
   res.render("urls_login", templateVars);
     
 });
@@ -125,7 +125,11 @@ app.post("/urls/:shortURL", (req ,res) => {
 //Our main post path to create new URLs for our database. not accessible without a login
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
+
+  let longURL = req.body.longURL;
+  if (!longURL.includes("http")) {
+    longURL = `https://${longURL}`;
+  }
   
   urlDatabase[shortURL] = { longURL: longURL, userID: req.session.user_id};
   
@@ -148,10 +152,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
   
   if (authenticator(users, req.body.email, req.body.password) === "Email Error") {
-    res.status(403).send("Error 403: Email not found");
+    let templateVars = { error: "Error 403: Email not found", user: null };
+    res.render("urls_login", templateVars);
   }
   if (authenticator(users, req.body.email, req.body.password) === "Password Error") {
-    res.status(403).send("Error 403: Password does not match");
+    let templateVars = { error: "Error 403: Incorrect Password", user: null };
+    res.render("urls_login", templateVars);
   }
   
   req.session.user_id = (authenticator(users, req.body.email, req.body.password));
@@ -171,10 +177,12 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send("Error 400 Bad Request");
+    let templateVars = { error: "Error 400: Bad Request", user: null };
+    res.render("urls_register", templateVars);
   }
   if (emailChecker(users, req.body.email) === true) {
-    return res.status(400).send("Error 400, Email is already in use");
+    let templateVars = { error: "Error 400: Email is already in use", user: null };
+    res.render("urls_register", templateVars);
   }
   const userID = generateRandomString();
   users[userID] = {id: userID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)};
@@ -186,6 +194,7 @@ app.post("/register", (req, res) => {
 
 //Our edit page route. Requires a login
 app.get("/u/:shortURL", (req, res) => {
+  console.log(req.params);
   const longURL = urlDatabase[req.params.shortURL].longURL;
   
   res.redirect(longURL);

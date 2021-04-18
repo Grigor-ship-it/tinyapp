@@ -10,6 +10,9 @@
 </head>
 <%- include('partials/_header') %>
 <body>
+  <% if(locals.error) { %>
+    <div class="alert alert-danger" role="alert"><%= error %></div>
+    <% } %>
   <h3><b>Create Account</b></h3>
   <main>
     <form class="form-inline" action="/register" method="POST">

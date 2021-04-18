@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 
+// Was not able to remove .join and let id be emptry string, caused errors.
 const generateRandomString = function() {
   let id = [];
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -8,6 +9,7 @@ const generateRandomString = function() {
   } return id.join("");
 };
 
+//Email checker function returns true or false if email was valid when compared in database.
 const emailChecker = function(usersObj, userEmail) {
   for (let user in usersObj) {
     console.log(Object.keys(usersObj), "logging users");
@@ -18,6 +20,7 @@ const emailChecker = function(usersObj, userEmail) {
   } return false;
 };
 
+//Authenticator function which verifies user information and compares with database to allow login.
 const authenticator = function(usersObj, userEmail, userPass) {
   for (let user in usersObj) {
     if (usersObj[user].email === userEmail) {
@@ -28,6 +31,7 @@ const authenticator = function(usersObj, userEmail, userPass) {
   } return "Email Error";
 };
 
+//Function which filters out all other user submitted URLS except for specific users.
 const urlsUser = function(id, usersObj) {
   let newVars = {};
  
